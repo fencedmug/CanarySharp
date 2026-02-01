@@ -21,3 +21,11 @@ Echo
 Call
 - calls another endpoint
 - meant for connectivity checks
+
+## Todos:
+- https support - to help check if certs generated works
+- host both http & https
+- add endpoints to test commonly used services
+  - redis
+  - database
+- add endpoints to test aws iam roles when calling various services
