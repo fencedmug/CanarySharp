@@ -7,6 +7,7 @@
 - provides fake endpoint to simulate spring boot healthcheck
   - DynamicGets__0 = /actuator/health
   - DynamicGets__1 = /actuator/liveliness
+  - DynamicAppendCtxPath = false
 ```json
 {
   "containerDefinitions": [
@@ -28,7 +29,8 @@
         { "name": "CustomPath", "value": "custom-api-name" },
         { "name": "DynamicGets__0", "value": "/actuator/health" },
         { "name": "DynamicGets__1", "value": "/actuator/liveliness" },
-        { "name": "HttpsCertP12__Type", "value": "base64" },
+        { "name": "DynamicAppendCtxPath", "value": "false" },
+        { "name": "HttpsCertP12__Type", "value": "base64" }
       ],
       "secrets": [
         {

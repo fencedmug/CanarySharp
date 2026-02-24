@@ -6,11 +6,13 @@ public static class DynamicEndpoints
     {
         var ctxPath = webapp.Configuration["ContextPath"] ?? string.Empty;
         var dynGets = webapp.Configuration.GetSection("DynamicGets").Get<string[]>();
+        var addCtxPath = webapp.Configuration.GetSection("DynamicAppendCtxPath").Get<bool>();
 
         foreach (var path in dynGets ?? [])
         {
+            var apipath = addCtxPath ? UrlExt.Combine(ctxPath, path) : path;
             webapp
-                .MapGet(UrlExt.Combine(ctxPath, path), () => $"DynamicGet - {path}")
+                .MapGet(apipath, () => $"DynamicGet - {path}")
                 .WithTags(nameof(DynamicEndpoints));
         }
 

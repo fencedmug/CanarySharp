@@ -15,8 +15,12 @@ Version
 - value returned by /version
 - this is meant for pipelines to replace/insert value
 
-## Swagger
-```http://<addr>/swagger/index.html```
+## Local testing
+```http://localhost:8443/swagger/index.html```
+```
+podman compose up -d cs-local
+podman compose down cs-local
+```
 
 ## Configuration via Environment variables
 ```
@@ -27,6 +31,7 @@ ContextPath=env_api
 CustomPath=env_custom
 DynamicGets__0="/actuator/health"
 DynamicGets__1="/actuator/health/readiness"
+DynamicAppendCtxPath=false
 ```
 
 ## APIs
