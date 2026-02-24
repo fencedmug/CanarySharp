@@ -1,0 +1,17 @@
+services:
+  canarysharp:
+    image: fencedmug/canarysharp:latest
+    ports:
+      - "8080"
+      - "8443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - Urls=https://*:8443;http://*:8080
+      - ContextPath=api
+      - CustomPath=custom-api-name
+      - DynamicGets__0=/actuator/health
+      - DynamicGets__1=/actuator/liveliness
+      - HttpsCertP12__Type=filepath
+      - HttpsCertP12__Value=/app/certs/selfsign.p12
+    volumes:
+      - ./selfsign.p12:/app/certs/selfsign.p12:ro

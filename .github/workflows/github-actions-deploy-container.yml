@@ -3,6 +3,9 @@ name: Build and Deploy Container
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - '.git*'
   workflow_dispatch:
 
 env:
@@ -37,20 +40,7 @@ jobs:
           tags: |
             type=raw,value=latest
 
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./CanarySharp/Dockerfile
-          push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          build-args: |
-            BUILD_CONFIGURATION=Release
-
-      - name: Push Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .

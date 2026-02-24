@@ -11,12 +11,12 @@ public static class CanaryEndpoint
     {
         var ctxPath = webapp.Configuration["ContextPath"] ?? string.Empty;
         
-        webapp.MapGet(ctxPath + "version", Version);
-        webapp.MapGet(ctxPath + "echo", Echo);
-        webapp.MapPost(ctxPath + "call", Call);
+        webapp.MapGet(UrlExt.Combine(ctxPath, "version"), Version);
+        webapp.MapGet(UrlExt.Combine(ctxPath, "echo"), Echo);
+        webapp.MapPost(UrlExt.Combine(ctxPath, "call"), Call);
 
         var pathName = webapp.Configuration["CustomPath"] ?? "custompath";
-        var customPath = Path.Combine(ctxPath, pathName);
+        var customPath = UrlExt.Combine(ctxPath, pathName);
         webapp.MapGet(customPath, CustomPathGet);
         webapp.MapPost(customPath, CustomPathPost);
 

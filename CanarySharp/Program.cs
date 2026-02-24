@@ -43,6 +43,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 var app = builder.Build();
 app.MapOpenApi();
 app.MapCanaryEndpoint();
+app.MapDynamicEndpoints();
 app.UseSwaggerUI(opt =>
 {
     opt.SwaggerEndpoint("/openapi/v1.json", "v1");

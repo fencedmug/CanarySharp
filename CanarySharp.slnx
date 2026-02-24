@@ -2,6 +2,7 @@
   <Folder Name="/Docs/">
     <File Path=".gitignore" />
     <File Path="README.md" />
+    <File Path="USECASES.md" />
   </Folder>
   <Project Path="CanarySharp/CanarySharp.csproj" />
 </Solution>
