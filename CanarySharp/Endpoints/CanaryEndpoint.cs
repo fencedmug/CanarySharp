@@ -10,9 +10,15 @@ public static class CanaryEndpoint
     public static WebApplication MapCanaryEndpoint(this WebApplication webapp)
     {
         var ctxPath = webapp.Configuration["ContextPath"] ?? string.Empty;
+        
         webapp.MapGet(ctxPath + "version", Version);
         webapp.MapGet(ctxPath + "echo", Echo);
         webapp.MapPost(ctxPath + "call", Call);
+
+        var pathName = webapp.Configuration["CustomPath"] ?? "custompath";
+        var customPath = Path.Combine(ctxPath, pathName);
+        webapp.MapGet(customPath, CustomPathGet);
+        webapp.MapPost(customPath, CustomPathPost);
 
         return webapp;
     }
@@ -87,10 +93,15 @@ public static class CanaryEndpoint
         "POST" => HttpMethod.Post,
         _ => throw new InvalidOperationException("Unknown action - needs to be GET/POST")
     };
-}
 
-public record CallRequest(string Url, string Method, JsonObject Data);
-public record CallResponse(string Message, Dictionary<string, IEnumerable<string>> Headers, string Data)
-{
-    public static CallResponse WithMessage(string msg) => new(msg, [], string.Empty);
-};
+    public static Ok<string> CustomPathGet()
+    {
+        return TypedResults.Ok("CustomPath GET");
+    }
+
+    public static Ok<JsonObject> CustomPathPost(JsonObject anyCtx)
+    {
+        anyCtx["CustomPath"] = "POST";
+        return TypedResults.Ok(anyCtx);
+    }
+}
