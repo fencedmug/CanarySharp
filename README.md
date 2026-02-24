@@ -2,6 +2,9 @@
 ![Docker Version](https://img.shields.io/docker/v/fencedmug/canarysharp)
 ![Docker Image Size](https://img.shields.io/docker/image-size/fencedmug/canarysharp/latest)
 
+## Dockerhub
+https://hub.docker.com/r/fencedmug/canarysharp
+
 ## Configuration (appsettings.json)
 ContextPath
 - this adds a context path to routes
