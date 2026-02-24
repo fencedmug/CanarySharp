@@ -1,7 +1,10 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.ComponentModel;
+using System.Text.Json.Nodes;
 
 namespace CanarySharp.Endpoints;
 
-public record CallRequest(string Url, string Method, RequestOptions Options, JsonObject Data);
-
-public record RequestOptions(string? Host);
+public record CallRequest(
+    [property: DefaultValue("http://localhost:8080/api/version")] string Url,
+    [property: DefaultValue("get")] string Method, 
+    [property: DefaultValue("localhost")] string? Host, 
+    JsonObject Data);

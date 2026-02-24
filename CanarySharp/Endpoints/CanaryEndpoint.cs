@@ -73,7 +73,7 @@ public static class CanaryEndpoint
         }
 
         outgoingMessage.Headers.Add(XHeaderCanarySent, "true");
-        client.DefaultRequestHeaders.Host = userRequest.Options?.Host ?? client.DefaultRequestHeaders.Host;
+        client.DefaultRequestHeaders.Host = userRequest.Host ?? client.DefaultRequestHeaders.Host;
 
         try
         {
