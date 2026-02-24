@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net;
 using System.Text.Json.Nodes;
 
 namespace CanarySharp.Endpoints;
@@ -46,7 +47,7 @@ public static class CanaryEndpoint
     /// <summary>
     /// Makes a call to remote endpoint
     /// </summary>
-    public static async Task<Ok<CallResponse>> Call(
+    public static async Task<Results<Ok<CallResponse>, InternalServerError<CallResponse>>> Call(
         CallRequest userRequest,
         HttpRequest httpRequest,
         IHttpClientFactory httpFactory)
@@ -72,19 +73,41 @@ public static class CanaryEndpoint
         }
 
         outgoingMessage.Headers.Add(XHeaderCanarySent, "true");
-        var outgoingResponse = await client.SendAsync(outgoingMessage);
+        client.DefaultRequestHeaders.Host = userRequest.Options?.Host ?? client.DefaultRequestHeaders.Host;
 
-        // get response from remote endpoint
-        var returnData = await outgoingResponse.Content.ReadAsStringAsync();
-        var returnHeaders = outgoingResponse.Headers
-                .Concat(outgoingResponse.Content.Headers)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        try
+        {
+            var outgoingResponse = await client.SendAsync(outgoingMessage);
 
-        return TypedResults.Ok(
-            new CallResponse(
-                $"{(int)outgoingResponse.StatusCode} - {outgoingResponse.StatusCode}", 
-                returnHeaders, 
-                returnData));
+            // get response from remote endpoint
+            var returnData = await outgoingResponse.Content.ReadAsStringAsync();
+            var returnHeaders = outgoingResponse.Headers
+                    .Concat(outgoingResponse.Content.Headers)
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            return TypedResults.Ok(
+                new CallResponse(
+                    $"{(int)outgoingResponse.StatusCode} - {outgoingResponse.StatusCode}",
+                    returnHeaders,
+                    returnData));
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = string.Empty;
+            Exception? ptr = ex;
+            while (ptr != null)
+            {
+                errorMsg += ptr.Message + " >> ";
+                ptr = ptr.InnerException;
+            }
+
+            return TypedResults.InternalServerError(
+                new CallResponse(
+                    $"{(int)HttpStatusCode.InternalServerError} - {HttpStatusCode.InternalServerError}",
+                    [],
+                    errorMsg)
+                );
+        }        
     }
 
     private static HttpMethod ParseMethod(string action) => action.ToUpper() switch

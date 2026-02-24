@@ -2,4 +2,6 @@
 
 namespace CanarySharp.Endpoints;
 
-public record CallRequest(string Url, string Method, JsonObject Data);
+public record CallRequest(string Url, string Method, RequestOptions Options, JsonObject Data);
+
+public record RequestOptions(string? Host);

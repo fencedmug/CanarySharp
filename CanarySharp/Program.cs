@@ -1,11 +1,35 @@
 using CanarySharp.Endpoints;
 using System.Security.Cryptography.X509Certificates;
-
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
+
+if (builder.Configuration.GetSection("HttpsDisableVerify").Get<bool>())
+{
+    builder.Services.ConfigureHttpClientDefaults(builder =>
+    {
+        builder.ConfigurePrimaryHttpMessageHandler((handler, provider) =>
+        {
+            if (handler is HttpClientHandler clientHandler)
+            {
+                // this disables any ssl checks for server's certificate
+                // https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclienthandler.dangerousacceptanyservercertificatevalidator?view=net-10.0
+                clientHandler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                Console.WriteLine("[Info] Disable server certificate validation");
+            }
+
+            if (handler is SocketsHttpHandler sockets)
+            {
+                // https://learn.microsoft.com/en-us/dotnet/api/system.net.security.remotecertificatevalidationcallback?view=net-10.0
+                sockets.SslOptions.RemoteCertificateValidationCallback = (_, _, _, _) => true;
+            }
+        });
+    });
+}
+
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ConfigureHttpsDefaults(listenOptions =>
@@ -22,23 +46,20 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         var p12File = type.ToLower() switch
         {
             "filepath" => File.Exists(value) ? value : throw new FileNotFoundException($"Cannot find file in HttpsCertP12:Value - {value}"),
-            "base64" => GetP12FilePath(value),
+            "base64" => CertExt.GetPathtoCert(value, "canary-https.p12"),
             _ => throw new Exception("Invalid HttpsCertP12:Type - needs to be filepath or base64"),
         };
-
-        static string GetP12FilePath(string value)
-        {
-            var path = Path.Combine(Path.GetTempPath(), "canary-https.p12");
-            var content = Convert.FromBase64String(value);
-            File.WriteAllBytes(path, content);
-            return path;
-        }
 
         Console.WriteLine($"[Info] Loading P12 from {p12File}");
         var serverCert = X509CertificateLoader.LoadPkcs12FromFile(p12File, "");
         listenOptions.ServerCertificate = serverCert;
     });
 });
+
+
+// add to truststore
+var truststoreCerts = builder.Configuration.GetSection("TruststoreCerts").Get<Dictionary<string, string>[]>() ?? [];
+CertExt.AddCertsToStore(truststoreCerts);
 
 var app = builder.Build();
 app.MapOpenApi();

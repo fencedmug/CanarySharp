@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
-USER 1001
+# USER 1001   # need to run in root because of adding certs into truststore
 WORKDIR /app
 
 # This stage is used to build the service project

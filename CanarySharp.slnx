@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Docs/">
     <File Path=".gitignore" />
+    <File Path="compose.yml" />
     <File Path="README.md" />
     <File Path="USECASES.md" />
   </Folder>

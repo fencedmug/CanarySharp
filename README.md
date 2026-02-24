@@ -15,8 +15,33 @@ Version
 - value returned by /version
 - this is meant for pipelines to replace/insert value
 
+HttpsCertP12
+- this cert is used for hosting https endpoint
+- Type: filepath or base64 (enum)
+- Value: filepath in container or the full base64 string of the cert
+
+HttpsDisableVerify
+- true = http calls to remote https won't validate server cert
+- false = https calls will try to validate
+
+TruststoreCerts
+- add certs to root truststore for https calls
+- this requires application to have root access or admin mode
+- Type: filepath or base64 (enum)
+- Value: filepath in container or the full base64 string of the cert
+
+DynamicGets
+- array of paths that will be generated to GET endpoints
+- useful if you need a list of endpoints to return 200 on GET
+
+DynamicAppendCtxPath
+- true = add ContextPath to all dynamic endpoints in DynamicGets
+- false = don't add ContextPath
+- set to false if using AWS's ALB healthcheck for ECS
+
 ## Local testing
-```http://localhost:8443/swagger/index.html```
+```https://localhost:8444/swagger/index.html```
+```http://localhost:8081/swagger/index.html```
 ```
 podman compose up -d cs-local
 podman compose down cs-local
@@ -27,11 +52,14 @@ podman compose down cs-local
 Urls=https://*:8443;http://*:8080
 HttpsCertP12__Type=filepath
 HttpsCertP12__Value=../selfsign.p12
+HttpsDisableVerify=false
 ContextPath=env_api
 CustomPath=env_custom
 DynamicGets__0="/actuator/health"
 DynamicGets__1="/actuator/health/readiness"
 DynamicAppendCtxPath=false
+TruststoreCerts__0__Type="filepath"
+TruststoreCerts__0__Value="../selfsign.cert"
 ```
 
 ## APIs
@@ -53,7 +81,7 @@ POST ```${ContextPath}/${CustomPath}```
 - similar to echo
 - returns caller's request
 
- 
+
 ## Todos:
 - add endpoints to test commonly used services
   - redis
@@ -63,7 +91,6 @@ POST ```${ContextPath}/${CustomPath}```
 
 
 # References
-
 ## Server Endpoint Configuration (Kestrel)
 https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/endpoints
 
