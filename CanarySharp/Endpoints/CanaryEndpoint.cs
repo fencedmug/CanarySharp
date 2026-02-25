@@ -122,9 +122,27 @@ public static class CanaryEndpoint
         return TypedResults.Ok("CustomPath GET");
     }
 
-    public static Ok<JsonObject> CustomPathPost(JsonObject anyCtx)
+    public static Ok<JsonObject> CustomPathPost(JsonObject anyCtx, IConfiguration config)
     {
-        anyCtx["CustomPath"] = "POST";
-        return TypedResults.Ok(anyCtx);
+        var predefinedResponse = config["CustomPathResponse"];
+        if (string.IsNullOrWhiteSpace(predefinedResponse))
+        {
+            anyCtx["CustomPath"] = "POST";
+            return TypedResults.Ok(anyCtx);
+        }
+        else
+        {
+            try
+            {
+                var jsonStr = Convert.FromBase64String(predefinedResponse);
+                var jsonObj = JsonNode.Parse(jsonStr)!.AsObject();
+                return TypedResults.Ok(jsonObj);
+            }
+            catch (Exception)
+            {
+                var jsonObj = JsonNode.Parse("""{ "error": "failed to parse CustomPathResponse" }""")!.AsObject();
+                return TypedResults.Ok(jsonObj);
+            }
+        }        
     }
 }

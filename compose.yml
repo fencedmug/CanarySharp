@@ -29,6 +29,7 @@ services:
       - Urls=https://*:8443;http://*:8080
       - ContextPath=local
       - CustomPath=localtesting123
+      - CustomPathResponse=ew0KICAiZXhhbXBsZSI6ICJyZXNwb25zZSINCn0=
       - DynamicGets__0=/actuator/health
       - DynamicGets__1=/actuator/liveliness
       - DynamicAppendCtxPath=false

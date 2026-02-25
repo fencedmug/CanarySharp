@@ -14,6 +14,11 @@ CustomPath
 - name of custom path that represents two api paths
 - GET & POST ```${ContextPath}/${CustomPath}```
 
+CustomPathResponse
+- base64 of a json string
+- this json is returned by POST ```${ContextPath}/${CustomPath}``
+- CustomPath endpoint will return caller's request if CustomPathResponse is empty
+
 Version
 - value returned by /version
 - this is meant for pipelines to replace/insert value
@@ -58,6 +63,7 @@ HttpsCertP12__Value=../selfsign.p12
 HttpsDisableVerify=false
 ContextPath=env_api
 CustomPath=env_custom
+CustomPathResponse=ew0KICAiZXhhbXBsZSI6ICJyZXNwb25zZSINCn0=
 DynamicGets__0="/actuator/health"
 DynamicGets__1="/actuator/health/readiness"
 DynamicAppendCtxPath=false
@@ -82,7 +88,7 @@ GET ```${ContextPath}/${CustomPath}```
 
 POST ```${ContextPath}/${CustomPath}```
 - similar to echo
-- returns caller's request
+- returns CustomPathResponse if defined, else caller's request
 
 
 ## Todos:
